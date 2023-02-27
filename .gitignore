@@ -1,2 +1,10 @@
-/out
-FindViewByMe.jar
+.gradle
+build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+out/
+
+### Mac OS ###
+.DS_Store
