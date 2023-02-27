@@ -1,23 +1,6 @@
 ## FindViewByMe
 
 A plugin for android developer, with the plugin you can generate "findViewById" code quickly.
-
- 
-### Download
-[JetBrains Plugin Repository :: FindViewByMe](https://plugins.jetbrains.com/plugin/8261)
-
-### Usage
-1.3.9 Support for targeting API 26
-
-1.3.6 now can remember "add m" profile info, thanks [xcc3641 \(谢三弟\)](https://github.com/xcc3641)
-
-1.3.5 support fragment, thanks [@fedestyla \(Federico Palmieri\)](https://github.com/fedestyla)
-
-1.3.0 support generate code in Java source file, thanks [@pengwei1024](https://github.com/pengwei1024?tab=following) 
-
-![](/screenshot/usage_in_java_source_file.gif)
-
- [使用简介：第一个插件 FindViewByMe](http://laobie.github.io/android/2015/11/27/find-view-by-me.html)
  
 ### License
 
