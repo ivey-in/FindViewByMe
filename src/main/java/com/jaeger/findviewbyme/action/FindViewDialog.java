@@ -1,179 +1,143 @@
 package com.jaeger.findviewbyme.action;
 
-import com.intellij.ide.util.PropertiesComponent;
-import com.jaeger.findviewbyme.model.PropertiesKey;
+import com.jaeger.findviewbyme.model.ViewPart;
+import org.jdesktop.swingx.combobox.ListComboBoxModel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
+import java.util.List;
 
 public class FindViewDialog extends JDialog {
     private JPanel contentPane;
-    public JButton btnCopyCode;
-    public JButton btnClose;
-    public JCheckBox chbAddRootView;
-    public JTextField textRootView;
-    public JTextArea textCode;
-    public JCheckBox chbAddM;
-    public JTable tableViews;
-    public JButton btnSelectAll;
-    public JButton btnSelectNone;
-    public JButton btnNegativeSelect;
-    private JCheckBox chbIsViewHolder;
-    private JCheckBox chbIsTarget26;
+
+    private JComboBox<String> codeTemplate;
+    private JButton editTemplate;
+    private JCheckBox chbAddM;
+    private JTextField varPrefix;
 
     private JTextField editSearch;
     private JButton btnSearch;
-    private JCheckBox chbIsKotlin;
-    private JCheckBox chbIsExtensions;
-    private onClickListener onClickListener;
+
+    private JTable tableViews;
+    private JButton btnSelectAll;
+    private JButton btnSelectNone;
+    private JButton btnNegativeSelect;
+
+    private JTextArea textCode;
+
+    private JButton btnCopyCode;
+    private JButton btnClose;
+
+    private FindViewController controller = new FindViewController();
+
+    private final static String[] HEADERS = {"selected", "type", "id", "name"};
 
     public FindViewDialog() {
         setContentPane(contentPane);
         setModal(true);
-        textRootView.setEnabled(false);
 
-        initStatus();
-
-        btnSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSearch(getSerch());
-                }
-
+        updateCodeTemp();
+        editTemplate.addActionListener(e -> onEditTemplateClick());
+        chbAddM.setSelected(controller.propes.isVarPrefixEnabled());
+        chbAddM.addChangeListener(e -> {
+            if (controller.setVarPrefixEnabled(chbAddM.isSelected())) {
+                updateTable();
+                updateTextCode();
             }
         });
-        btnCopyCode.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onOK();
-                }
-                onCancel();
-            }
-        });
-
-        textRootView.getDocument().addDocumentListener(new DocumentListener() {
+        String prefix = controller.propes.getVarPrefix();
+        varPrefix.setText(prefix);
+        varPrefix.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onUpdateRootView();
-                }
-
+                updateVarPrefix();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onUpdateRootView();
-                }
+                updateVarPrefix();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onUpdateRootView();
+                updateVarPrefix();
+            }
+
+            private void updateVarPrefix() {
+                if (controller.setVarPrefix(varPrefix.getText())) {
+                    updateTable();
+                    updateTextCode();
                 }
             }
         });
 
-        chbAddM.addChangeListener(new ChangeListener() {
+        btnSearch.addActionListener(new ActionListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSwitchAddM(chbAddM.isSelected());
-                    PropertiesComponent.getInstance().setValue(PropertiesKey.SAVE_ADD_M_ACTION, chbAddM.isSelected());
-                }
+            public void actionPerformed(ActionEvent e) {
+                int sel = controller.search(getSearch());
+                setTableSelect(Math.max(sel, 0));
             }
         });
 
-        chbIsViewHolder.addChangeListener(new ChangeListener() {
+
+        btnSelectAll.addActionListener(new ActionListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSwitchIsViewHolder(chbIsViewHolder.isSelected());
-                }
+            public void actionPerformed(ActionEvent e) {
+                controller.selectAll();
+                updateTable();
+                updateTextCode();
+            }
+        });
+        btnSelectNone.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.selectNone();
+                updateTable();
+                updateTextCode();
+            }
+        });
+        btnNegativeSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.negativeSelect();
+                updateTable();
+                updateTextCode();
             }
         });
 
-        chbIsTarget26.addChangeListener(new ChangeListener() {
+        btnCopyCode.addActionListener(new ActionListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSwitchIsTarget26(chbIsTarget26.isSelected());
-                    PropertiesComponent.getInstance().setValue(PropertiesKey.IS_TARGET_26, chbIsTarget26.isSelected());
-                }
+            public void actionPerformed(ActionEvent e) {
+                FindViewDialog.this.onCopy();
+                FindViewDialog.this.onCancel();
             }
         });
-
-        chbIsKotlin.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSwitchIsKotlin(chbIsKotlin.isSelected());
-                    PropertiesComponent.getInstance().setValue(PropertiesKey.IS_KT, chbIsKotlin.isSelected());
-                }
-            }
-        });
-        chbIsExtensions.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSwitchExtensions(chbIsExtensions.isSelected());
-                    PropertiesComponent.getInstance().setValue(PropertiesKey.IS_KT_ETX, chbIsExtensions.isSelected());
-                }
-            }
-        });
-
-        chbAddRootView.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                boolean isAdd = chbAddRootView.isSelected();
-                if (onClickListener != null) {
-                    onClickListener.onSwitchAddRootView(isAdd);
-                }
-                textRootView.setEnabled(isAdd);
-            }
-        });
-
         btnClose.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FindViewDialog.this.onCancel();
             }
         });
-        btnSelectAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSelectAll();
-                }
-            }
-        });
 
-        btnSelectNone.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onSelectNone();
-                }
-            }
-        });
+        contentPane.registerKeyboardAction(e -> FindViewDialog.this.onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        btnNegativeSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onNegativeSelect();
-                }
-            }
-        });
-
+        contentPane.registerKeyboardAction(e -> {
+                    FindViewDialog.this.onCopy();
+                    FindViewDialog.this.onCancel();
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -181,94 +145,121 @@ public class FindViewDialog extends JDialog {
                 onCancel();
             }
         });
-
-        contentPane.registerKeyboardAction(new ActionListener() {
-                                               @Override
-                                               public void actionPerformed(ActionEvent e) {
-                                                   FindViewDialog.this.onCancel();
-                                               }
-                                           },
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (onClickListener != null) {
-                    onClickListener.onOK();
-                }
-                FindViewDialog.this.onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    private void initStatus() {
-        chbAddM.setSelected(PropertiesComponent.getInstance().getBoolean(PropertiesKey.SAVE_ADD_M_ACTION, false));
-        chbIsTarget26.setSelected(PropertiesComponent.getInstance().getBoolean(PropertiesKey.IS_TARGET_26, false));
-        chbIsKotlin.setSelected(PropertiesComponent.getInstance().getBoolean(PropertiesKey.IS_KT, false));
-        chbIsExtensions.setSelected(PropertiesComponent.getInstance().getBoolean(PropertiesKey.IS_KT_ETX, false));
-    }
+    public void updateCodeTemp() {
+        List<String> temps = controller.propes.getAllTempList();
+        String curTemp = controller.propes.getCurTemp();
 
-    private void onCancel() {
-        dispose();
-        if (onClickListener != null) {
-            onClickListener.onFinish();
+        ListComboBoxModel<String> model = new ListComboBoxModel<String>(temps);
+        if (curTemp != null && temps.contains(curTemp)) {
+            model.setSelectedItem(curTemp);
         }
+        model.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                controller.propes.setCurTemp(model.getSelectedItem());
+                updateTextCode();
+            }
+        });
+        codeTemplate.setModel(model);
     }
 
-    public void setTextCode(String codeStr) {
-        textCode.setText(codeStr);
+    private void onEditTemplateClick() {
+
     }
 
-    public void setSelect(int position) {
-//        System.out.println("开始的位置"+position);
+    public String getSearch() {
+        String text = editSearch.getText();
+        return text != null ? text.trim() : "";
+    }
+
+    public void updateTable() {
+        tableViews.setModel(getTableModel());
+        tableViews.getColumnModel().getColumn(0).setPreferredWidth(20);
+    }
+
+    private DefaultTableModel getTableModel() {
+        List<ViewPart> viewParts = controller.getViewParts();
+        int size = viewParts.size();
+        Object[][] cellData = new Object[size][4];
+        for (int i = 0; i < size; i++) {
+            ViewPart viewPart = viewParts.get(i);
+            for (int j = 0; j < 4; j++) {
+                switch (j) {
+                    case 0:
+                        cellData[i][j] = viewPart.isSelected();
+                        break;
+                    case 1:
+                        cellData[i][j] = viewPart.getType();
+                        break;
+                    case 2:
+                        cellData[i][j] = viewPart.getId();
+                        break;
+                    case 3:
+                        cellData[i][j] = viewPart.getName();
+                        break;
+                }
+            }
+        }
+
+        DefaultTableModel tableModel = new DefaultTableModel(cellData, HEADERS) {
+            final Class[] typeArray = {Boolean.class, Object.class, Object.class, Object.class};
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 0;
+            }
+
+            @SuppressWarnings("rawtypes")
+            public Class getColumnClass(int column) {
+                return typeArray[column];
+            }
+        };
+        tableModel.addTableModelListener(event -> {
+            int row = event.getFirstRow();
+            int column = event.getColumn();
+            if (column == 0) {
+                Boolean isSelected = (Boolean) tableModel.getValueAt(row, column);
+                controller.select(row, isSelected);
+                updateTextCode();
+            }
+        });
+        return tableModel;
+    }
+
+    public void setTableSelect(int position) {
         tableViews.grabFocus();
         tableViews.changeSelection(position, 1, false, false);
     }
 
-    public interface onClickListener {
-        void onUpdateRootView();
-
-        void onOK();
-
-        void onSelectAll();
-
-        void onSearch(String string);
-
-        void onSelectNone();
-
-        void onNegativeSelect();
-
-        void onSwitchAddRootView(boolean isAddRootView);
-
-        void onSwitchAddM(boolean addM);
-
-        void onSwitchIsViewHolder(boolean isViewHolder);
-
-        void onSwitchIsKotlin(boolean isKotlin);
-
-        void onSwitchExtensions(boolean isExtensions);
-
-        void onSwitchIsTarget26(boolean target26);
-
-
-        void onFinish();
+    public void updateTextCode() {
+        textCode.setText(controller.generateCode());
     }
 
-    public void setOnClickListener(FindViewDialog.onClickListener onClickListener) {
-        this.onClickListener = onClickListener;
+    private void onCopy() {
+        Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable tText = new StringSelection(textCode.getText());
+        clip.setContents(tText, null);
     }
 
-    public void setModel(DefaultTableModel model) {
-        tableViews.setModel(model);
-        tableViews.getColumnModel().getColumn(0).setPreferredWidth(20);
+    private void onCancel() {
+        dispose();
     }
 
-    public String getRootView() {
-        return textRootView.getText().trim();
-    }
-
-    public String getSerch() {
-        return editSearch.getText().trim();
+    public void setViewParts(List<ViewPart> viewParts) {
+        controller.setViewParts(viewParts);
+        updateTable();
+        updateTextCode();
     }
 }

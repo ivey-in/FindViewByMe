@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.jaeger.findviewbyme</id>
     <name>FindViewByMe</name>
-    <version>1.4.3</version>
+    <version>2.0</version>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.androidstudio</depends>
     <vendor email="chjie.jaeger@gmail.com" url="http://laobie.github.io">Jaeger</vendor>
@@ -10,32 +10,14 @@
         A plugin for android developer, with the plugin you can generate "findViewById" code quickly.<br>
     ]]></description>
 
-    <change-notes><![CDATA[
-     <li>0. Fix compatibility issues</li>
-     <li>1. Added smart cast checkbox when targeting API 26</li>
-     <li>2. Support generate "findViewById" code for activity.</li>
-     <li>3. Support generate "findViewById" code for fragment, and you can customize root view name.</li>
-     <li>4. Support generate "findViewById" code for ViewHolder.</li>
-     <li>5. Add search function</li>
-     <li>6. Bug fix</li>
-     <br>
-    ]]>
-    </change-notes>
-
     <idea-version since-build="93.13"/>
 
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
 
     <actions>
-        <action id="AutoFindView" class="com.jaeger.findviewbyme.action.FindViewByMeAction" text="_FindViewByMe">
-            <add-to-group group-id="GenerateGroup"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl Y"/>
-        </action>
-    </actions>
-
-    <actions>
-        <action id="AutoFindView_xml" class="com.jaeger.findviewbyme.action.FindViewByMeXmlAction" text="_FindViewByMe (xml)">
+        <action id="AutoFindView" class="com.jaeger.findviewbyme.action.FindViewByMeAction"
+                text="_FindViewByMe">
             <add-to-group group-id="XmlGenerateToolsGroup" anchor="before" relative-to-action="GenerateDTD"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl Y"/>
         </action>

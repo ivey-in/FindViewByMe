@@ -145,22 +145,22 @@ public class CodeWriter extends WriteCommandAction.Simple {
             methodBuild = new StringBuilder("private void initView() {");
         }
         for (ViewPart viewPart : viewPartList) {
-            if (!viewPart.isSelected() || fieldExist(viewPart)) {
-                continue;
-            }
-            mClass.add(mFactory.createFieldFromText(viewPart.getDeclareString(false, false), mClass));
-            if (initViewMethod != null) {
-                initViewMethod.getBody().add(mFactory.createStatementFromText(viewPart.getFindViewString(isTarget26), mClass));
-            } else {
-                if (isViewHolder) {
-                    methodBuild.append(viewPart.getFindViewStringForViewHolder("convertView",isTarget26));
-                } else if (isAddRootView && !TextUtils.isEmpty(rootViewStr)) {
-                    methodBuild.append(viewPart.getFindViewStringWithRootView(rootViewStr,isTarget26));
-                } else {
-                    methodBuild.append(viewPart.getFindViewString(isTarget26));
-                }
-                fieldCount++;
-            }
+//            if (!viewPart.isSelected() || fieldExist(viewPart)) {
+//                continue;
+//            }
+//            mClass.add(mFactory.createFieldFromText(viewPart.getDeclareString(false, false), mClass));
+//            if (initViewMethod != null) {
+//                initViewMethod.getBody().add(mFactory.createStatementFromText(viewPart.getFindViewString(isTarget26), mClass));
+//            } else {
+//                if (isViewHolder) {
+//                    methodBuild.append(viewPart.getFindViewStringForViewHolder("convertView",isTarget26));
+//                } else if (isAddRootView && !TextUtils.isEmpty(rootViewStr)) {
+//                    methodBuild.append(viewPart.getFindViewStringWithRootView(rootViewStr,isTarget26));
+//                } else {
+//                    methodBuild.append(viewPart.getFindViewString(isTarget26));
+//                }
+//                fieldCount++;
+//            }
         }
         methodBuild.append("}");
         if (fieldCount > 0) {

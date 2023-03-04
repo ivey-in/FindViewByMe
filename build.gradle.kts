@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.jaeger.findviewbyme"
-version = "1.4.3"
+version = "2.0"
 
 repositories {
     mavenCentral()

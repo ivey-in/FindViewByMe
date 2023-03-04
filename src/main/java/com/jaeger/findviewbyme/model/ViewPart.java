@@ -1,8 +1,5 @@
 package com.jaeger.findviewbyme.model;
 
-import com.jaeger.findviewbyme.util.Definitions;
-import com.jaeger.findviewbyme.util.Utils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,48 +9,18 @@ import java.util.regex.Pattern;
  */
 public class ViewPart {
 
-    private static final String OUTPUT_DECLARE_STRING = "private %s %s;\n";
-    private static final String OUTPUT_DECLARE_STRING_NOT_PRIVATE = "%s %s;\n";
-
-    private static final String OUTPUT_FIND_VIEW_STRING = "%s = (%s) findViewById(R.id.%s);\n";
-    private static final String OUTPUT_FIND_VIEW_STRING_TARGET26 = "%s = findViewById(R.id.%s);\n";
-
-    private static final String OUTPUT_FIND_VIEW_STRING_KOTLIN = "private val %s: %s by lazy { findViewById<%s>(R.id.%s) }\n";
-
-    private static final String OUTPUT_FIND_VIEW_STRING_WITH_ROOT_VIEW = "%s = (%s) %s.findViewById(R.id.%s);\n";
-    private static final String OUTPUT_FIND_VIEW_STRING_WITH_ROOT_VIEW_TARGET26 = "%s = %s.findViewById(R.id.%s);\n";
-
-    private static final String OUTPUT_FIND_VIEW_STRING_FOR_VIEW_HOLDER = "viewHolder.%s = (%s) %s.findViewById(R.id.%s);\n";
-    private static final String OUTPUT_FIND_VIEW_STRING_FOR_VIEW_HOLDER_TARGET26 = "viewHolder.%s = %s.findViewById(R.id.%s);\n";
-
+    private boolean selected = true;
     private String type;
     private String typeFull;
     private String id;
     private String name;
-    private String scrNameFromId;
-    private boolean selected;
 
-
-    public ViewPart() {
-        selected = true;
+    public boolean isSelected() {
+        return selected;
     }
 
-
-    private void generateName(String id) {
-        Pattern pattern = Pattern.compile("_([a-zA-Z])");
-        Matcher matcher = pattern.matcher(id);
-
-        char[] chars = id.toCharArray();
-        scrNameFromId = String.copyValueOf(chars);
-        while (matcher.find()) {
-            int index = matcher.start(1);
-            chars[index] = Character.toUpperCase(chars[index]);
-        }
-        String name = String.copyValueOf(chars);
-
-        name = name.replaceAll("_", "");
-
-        setName(name);
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public String getType() {
@@ -81,9 +48,8 @@ public class ViewPart {
 
     public void setId(String id) {
         this.id = id;
-        generateName(id);
+//        generateName(id);
     }
-
 
     public String getName() {
         return name;
@@ -93,85 +59,30 @@ public class ViewPart {
         this.name = name;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-
-    public String getDeclareString(boolean isViewHolder, boolean isShow) {
-        if (isViewHolder) {
-            return String.format(OUTPUT_DECLARE_STRING_NOT_PRIVATE, type, name);
-        } else {
-            if (isShow) {
-                return String.format(OUTPUT_DECLARE_STRING, type, name);
-            }
-
-            String realType;
-            if (!Utils.isEmptyString(getTypeFull())) {
-                realType = getTypeFull();
-            } else if (Definitions.paths.containsKey(getType())) {
-                realType = Definitions.paths.get(getType());
-            } else {
-                realType = "android.widget." + getType();
-            }
-            return String.format(OUTPUT_DECLARE_STRING, realType, name);
-        }
-    }
-
-
-    public String getFindViewStringWithRootView(String rootView, boolean isTarget26) {
-        if (isTarget26)
-            return String.format(OUTPUT_FIND_VIEW_STRING_WITH_ROOT_VIEW_TARGET26, name, rootView, id);
-
-        return String.format(OUTPUT_FIND_VIEW_STRING_WITH_ROOT_VIEW, name, type, rootView, id);
-    }
-
-    public String getFindViewString(boolean isTarget26) {
-        if (isTarget26)
-            return String.format(OUTPUT_FIND_VIEW_STRING_TARGET26, name, id);
-
-        return String.format(OUTPUT_FIND_VIEW_STRING, name, type, id);
-    }
-
-    public String getFindViewStringKt(boolean isExtensions) {
-        String lName = "";
-        if (isExtensions) {
-            lName = scrNameFromId;
-        } else {
-            lName = name;
-        }
-
-        return String.format(OUTPUT_FIND_VIEW_STRING_KOTLIN, lName, type, type, id);
-    }
-
     public void resetName() {
         generateName(id);
     }
 
-    public void addMForName() {
-        generateName("m_" + id);
+    public void addPrefixForName(String prefix) {
+        if (prefix != null && !prefix.isEmpty()) {
+            generateName(prefix + "_" + id);
+        }
     }
 
-    public String getFindViewStringForViewHolder(String rootView, boolean isTarget26) {
-        if (isTarget26)
-            return String.format(OUTPUT_FIND_VIEW_STRING_FOR_VIEW_HOLDER_TARGET26, name, rootView, id);
+    private void generateName(String id) {
+        Pattern pattern = Pattern.compile("_([a-zA-Z])");
+        Matcher matcher = pattern.matcher(id);
 
-        return String.format(OUTPUT_FIND_VIEW_STRING_FOR_VIEW_HOLDER, name, type, rootView, id);
-    }
+        char[] chars = id.toCharArray();
+        while (matcher.find()) {
+            int index = matcher.start(1);
+            chars[index] = Character.toUpperCase(chars[index]);
+        }
+        String name = String.copyValueOf(chars);
 
+        name = name.replaceAll("_", "");
 
-    @Override
-    public String toString() {
-        return "ViewPart{" +
-                "type='" + type + '\'' +
-                ", id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", selected=" + selected +
-                '}';
+        setName(name);
     }
 }
 
