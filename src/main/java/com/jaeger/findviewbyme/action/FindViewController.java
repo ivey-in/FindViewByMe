@@ -1,6 +1,7 @@
 package com.jaeger.findviewbyme.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.jaeger.findviewbyme.model.FindViewPropes;
@@ -52,12 +53,14 @@ public class FindViewController {
         return viewParts;
     }
 
+    private Project project;
     private Editor editor;
     private PsiFile file;
     PsiClass psiClass;
 
     @Nonnull
-    public void setViewParts(Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
+    public void setViewParts(Project project, Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
+        this.project = project;
         this.editor = editor;
         this.file = file;
         this.psiClass = psiClass;
@@ -67,6 +70,10 @@ public class FindViewController {
         }
         updateName();
         resetSearch();
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     private void resetSearch() {

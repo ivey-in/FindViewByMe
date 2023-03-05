@@ -22,6 +22,8 @@ public class FindViewPropes {
             + "val @N = itemView.findViewById<@T>(@I)\n"
             + "private @T @N;-->@N = findViewById(@I);";
 
+    public static final String TIPS = "@N for name, @T for type, @I for id, --> split multi statements";
+
     private String curTemp;
     private String allTemp;
 
@@ -75,13 +77,12 @@ public class FindViewPropes {
     }
 
     public String getAllTemp() {
-        return allTemp;
+        return (allTemp != null && !allTemp.trim().isEmpty()) ? allTemp : DEFAULT_TEMP;
     }
 
     @Nonnull
     public List<String> getAllTempList() {
-        String str = (allTemp != null && !allTemp.trim().isEmpty()) ? allTemp : DEFAULT_TEMP;
-        return Arrays.asList(str.split("\n"));
+        return Arrays.asList(getAllTemp().split("\n"));
     }
 
     public boolean setAllTemp(String allTemp) {

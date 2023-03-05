@@ -1,8 +1,11 @@
 package com.jaeger.findviewbyme.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
+import com.jaeger.findviewbyme.model.FindViewPropes;
 import com.jaeger.findviewbyme.model.ViewPart;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 
@@ -21,6 +24,8 @@ import java.util.List;
 
 public class FindViewDialog extends JDialog {
     private JPanel contentPane;
+
+    private JLabel tips;
 
     private JComboBox<String> codeTemplate;
     private JButton editTemplate;
@@ -49,6 +54,7 @@ public class FindViewDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
+        tips.setText(FindViewPropes.TIPS);
         updateCodeTemp();
         editTemplate.addActionListener(e -> onEditTemplateClick());
         chbAddM.setSelected(controller.propes.isVarPrefixEnabled());
@@ -187,7 +193,22 @@ public class FindViewDialog extends JDialog {
     }
 
     private void onEditTemplateClick() {
-
+        EditTemplateDialog dialog = new EditTemplateDialog();
+        dialog.setTemplate(controller.propes.getAllTemp());
+        dialog.setOnSaveListener(new EditTemplateDialog.OnSaveListener() {
+            @Override
+            public void onSave(EditTemplateDialog dialog, String text) {
+                if (controller.propes.setAllTemp(text)) {
+                    updateCodeTemp();
+                    updateTable();
+                    updateTextCode();
+                }
+            }
+        });
+        dialog.pack();
+        dialog.setLocationRelativeTo(WindowManager.getInstance().getFrame(controller.getProject()));
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
     }
 
     public String getSearch() {
@@ -272,8 +293,8 @@ public class FindViewDialog extends JDialog {
         dispose();
     }
 
-    public void setViewParts(Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
-        controller.setViewParts(editor, file, psiClass, viewParts);
+    public void setViewParts(Project project, Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
+        controller.setViewParts(project, editor, file, psiClass, viewParts);
         btnInjectCode.setVisible(controller.isInjectCodeSupported());
         updateTable();
         updateTextCode();

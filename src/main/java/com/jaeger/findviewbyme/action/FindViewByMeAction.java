@@ -47,7 +47,7 @@ public class FindViewByMeAction extends AnAction {
         }
 
         FindViewDialog findViewDialog = new FindViewDialog();
-        findViewDialog.setViewParts(editor, psiFile, getTargetClass(editor, psiFile), viewParts);
+        findViewDialog.setViewParts(project, editor, psiFile, getTargetClass(editor, psiFile), viewParts);
         findViewDialog.pack();
         findViewDialog.setLocationRelativeTo(WindowManager.getInstance().getFrame(project));
         findViewDialog.setVisible(true);
