@@ -68,10 +68,6 @@ public class ViewSaxHandler extends DefaultHandler {
         parser.parse(xmlStream, this);
     }
 
-    public void createViewList(InputStream xmlStream) throws Exception {
-
-    }
-
 
     @Override
     public void startDocument() throws SAXException {

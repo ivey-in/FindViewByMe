@@ -1,7 +1,5 @@
 package com.jaeger.findviewbyme.action;
 
-import com.intellij.codeInsight.CodeInsightActionHandler;
-import com.intellij.codeInsight.generation.actions.BaseGenerateAction;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -9,11 +7,16 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.SyntheticElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jaeger.findviewbyme.model.ViewPart;
 import com.jaeger.findviewbyme.util.ActionUtil;
 import com.jaeger.findviewbyme.util.Utils;
 import com.jaeger.findviewbyme.util.ViewSaxHandler;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
@@ -37,15 +40,14 @@ public class FindViewByMeAction extends AnAction {
         }
 
         List<ViewPart> viewParts;
-        if ("XML".equals(psiFile.getFileType().getName())) {
+        if ("XML".equalsIgnoreCase(psiFile.getFileType().getName())) {
             viewParts = getViewPartsXml(project, psiFile, editor);
         } else {
             viewParts = getViewParts(project, psiFile, editor);
         }
 
-
         FindViewDialog findViewDialog = new FindViewDialog();
-        findViewDialog.setViewParts(viewParts);
+        findViewDialog.setViewParts(editor, psiFile, getTargetClass(editor, psiFile), viewParts);
         findViewDialog.pack();
         findViewDialog.setLocationRelativeTo(WindowManager.getInstance().getFrame(project));
         findViewDialog.setVisible(true);
@@ -71,17 +73,38 @@ public class FindViewByMeAction extends AnAction {
             contentStr = layout.getText();
         }
         if (psiFile.getParent() != null) {
+            String layoutPath = "";
+
             String javaPath = psiFile.getContainingDirectory().toString().replace("PsiDirectory:", "");
+
             String javaPathKey = "src" + File.separator + "main" + File.separator + "java";
             int indexOf = javaPath.indexOf(javaPathKey);
-            String layoutPath = "";
             if (indexOf != -1) {
                 layoutPath = javaPath.substring(0, indexOf) + "src" + File.separator + "main" + File.separator + "res" + File.separator + "layout";
             }
+
+            if (layoutPath.isEmpty()) {
+                // 兼容自定义的 sourceSets
+                javaPathKey = File.separator + "src" + File.separator;
+                indexOf = javaPath.indexOf(javaPathKey);
+                if (indexOf != -1) {
+                    layoutPath = javaPath.substring(0, indexOf) + File.separator + "res" + File.separator + "layout";
+                }
+            }
+
             viewSaxHandler.setLayoutPath(layoutPath);
             viewSaxHandler.setProject(project);
         }
         return ActionUtil.getViewPartList(viewSaxHandler, contentStr);
+    }
+
+    @Nullable
+    protected PsiClass getTargetClass(Editor editor, PsiFile file) {
+        int offset = editor.getCaretModel().getOffset();
+        PsiElement element = file.findElementAt(offset);
+        if (element == null) return null;
+        final PsiClass target = PsiTreeUtil.getParentOfType(element, PsiClass.class);
+        return target instanceof SyntheticElement ? null : target;
     }
 
 }

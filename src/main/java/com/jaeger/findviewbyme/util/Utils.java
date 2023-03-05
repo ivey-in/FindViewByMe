@@ -230,7 +230,7 @@ public class Utils {
      * @param msg
      */
     public static void alert(String msg) {
-        Messages.showMessageDialog(msg, "FindViewByMe", Messages.getInformationIcon());
+        Messages.showMessageDialog(msg, "", Messages.getInformationIcon());
     }
 
     /**

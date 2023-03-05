@@ -1,7 +1,11 @@
 package com.jaeger.findviewbyme.action;
 
+import com.intellij.openapi.editor.Editor;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
 import com.jaeger.findviewbyme.model.FindViewPropes;
 import com.jaeger.findviewbyme.model.ViewPart;
+import com.jaeger.findviewbyme.util.JavaCodeWriter;
 import com.jaeger.findviewbyme.util.TextUtils;
 import com.jaeger.findviewbyme.util.Utils;
 
@@ -48,8 +52,15 @@ public class FindViewController {
         return viewParts;
     }
 
+    private Editor editor;
+    private PsiFile file;
+    PsiClass psiClass;
+
     @Nonnull
-    public void setViewParts(List<ViewPart> viewParts) {
+    public void setViewParts(Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
+        this.editor = editor;
+        this.file = file;
+        this.psiClass = psiClass;
         this.viewParts.clear();
         if (viewParts != null) {
             this.viewParts.addAll(viewParts);
@@ -122,6 +133,16 @@ public class FindViewController {
     public void select(int index, boolean selected) {
         if (index >= 0 && index < viewParts.size()) {
             viewParts.get(index).setSelected(selected);
+        }
+    }
+
+    public boolean isInjectCodeSupported() {
+        return psiClass != null;
+    }
+
+    public void injectCode() {
+        if (isInjectCodeSupported()) {
+            new JavaCodeWriter(editor, file, psiClass, viewParts, propes.getCurTempList()).execute();
         }
     }
 

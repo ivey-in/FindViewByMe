@@ -1,5 +1,8 @@
 package com.jaeger.findviewbyme.action;
 
+import com.intellij.openapi.editor.Editor;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
 import com.jaeger.findviewbyme.model.ViewPart;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 
@@ -34,6 +37,7 @@ public class FindViewDialog extends JDialog {
 
     private JTextArea textCode;
 
+    private JButton btnInjectCode;
     private JButton btnCopyCode;
     private JButton btnClose;
 
@@ -114,6 +118,13 @@ public class FindViewDialog extends JDialog {
             }
         });
 
+        btnInjectCode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FindViewDialog.this.onInjectCode();
+                FindViewDialog.this.onCancel();
+            }
+        });
         btnCopyCode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -247,6 +258,10 @@ public class FindViewDialog extends JDialog {
         textCode.setText(controller.generateCode());
     }
 
+    private void onInjectCode() {
+        controller.injectCode();
+    }
+
     private void onCopy() {
         Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable tText = new StringSelection(textCode.getText());
@@ -257,8 +272,9 @@ public class FindViewDialog extends JDialog {
         dispose();
     }
 
-    public void setViewParts(List<ViewPart> viewParts) {
-        controller.setViewParts(viewParts);
+    public void setViewParts(Editor editor, PsiFile file, PsiClass psiClass, List<ViewPart> viewParts) {
+        controller.setViewParts(editor, file, psiClass, viewParts);
+        btnInjectCode.setVisible(controller.isInjectCodeSupported());
         updateTable();
         updateTextCode();
     }
