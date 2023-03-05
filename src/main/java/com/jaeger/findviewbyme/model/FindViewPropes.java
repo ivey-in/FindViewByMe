@@ -22,7 +22,7 @@ public class FindViewPropes {
             + "val @N = itemView.findViewById<@T>(@I)\n"
             + "private @T @N;-->@N = findViewById(@I);";
 
-    public static final String TIPS = "@N for name, @T for type, @I for id, --> split multi statements";
+    public static final String TIPS = "@N for name, @T for type, @I for id, --> for statement-separator";
 
     private String curTemp;
     private String allTemp;
