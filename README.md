@@ -1,6 +1,11 @@
 ## FindViewByMe
 
 A plugin for android developer, with the plugin you can generate "findViewById" code quickly.
+
+Usage:
+  1. Right-click on layout XML -> FindViewByMe
+  2. Right-click on layout_name (R.id.layout_name) in Java source -> FindViewByMe
+  3. Select text on layout XML -> FindViewByMe Selection
  
 ### License
 
