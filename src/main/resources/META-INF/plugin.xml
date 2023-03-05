@@ -16,10 +16,11 @@
     </extensions>
 
     <actions>
-        <action id="AutoFindView" class="com.jaeger.findviewbyme.action.FindViewByMeAction"
-                text="_FindViewByMe">
+        <group>
+            <action id="AutoFindView" class="com.jaeger.findviewbyme.action.FindViewByMeAction" text="_FindViewByMe"/>
+            <action id="AutoFindViewSelection" class="com.jaeger.findviewbyme.action.FindViewByMeSelectionAction"
+                    text="_FindViewByMe Selection"/>
             <add-to-group group-id="XmlGenerateToolsGroup" anchor="before" relative-to-action="GenerateDTD"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl Y"/>
-        </action>
+        </group>
     </actions>
 </idea-plugin>

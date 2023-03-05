@@ -18,8 +18,10 @@ public class ActionUtil {
 
     public static List<ViewPart> getViewPartList(ViewSaxHandler viewSaxHandler, String oriContact) {
         try {
-            viewSaxHandler.createViewList(oriContact);
-            return viewSaxHandler.getViewPartList();
+            if (oriContact != null) {
+                viewSaxHandler.createViewList(oriContact);
+                return viewSaxHandler.getViewPartList();
+            }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
