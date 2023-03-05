@@ -10,6 +10,7 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
 import com.jaeger.findviewbyme.model.ViewPart;
 import com.jaeger.findviewbyme.util.ActionUtil;
+import com.jaeger.findviewbyme.util.TextUtils;
 import com.jaeger.findviewbyme.util.ViewSaxHandler;
 
 import java.util.List;
@@ -36,8 +37,8 @@ public class FindViewByMeSelectionAction extends AnAction {
     private List<ViewPart> getViewParts(Project project, PsiFile psiFile, Editor editor) {
         ViewSaxHandler viewSaxHandler = new ViewSaxHandler();
 
-        String contentStr = editor.getSelectionModel().getSelectedText();
-        if (contentStr != null) {
+        String contentStr = TextUtils.trimLines(editor.getSelectionModel().getSelectedText());
+        if (contentStr != null && !contentStr.startsWith("<?xml")) {
             // 保证是合法的 xml 格式，比如选中的是 <View /> <View />，包裹之后是 <t-t> <View /> <View /> </t-t>
             contentStr = "<t-t>" + contentStr + "</t-t>";
         }
