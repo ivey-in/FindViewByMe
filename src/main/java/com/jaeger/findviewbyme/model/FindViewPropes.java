@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FindViewPropes {
-    public static final String PROPERTY_CUR_TEMP = "cur_temp";
-    public static final String PROPERTY_ALL_TEMP = "all_temp";
-    public static final String PROPERTY_VAR_PREFIX_ENABLED = "var_prefix_enabled";
-    public static final String PROPERTY_VAR_PREFIX = "var_prefix";
+    public static final String PROPERTY_CUR_TEMP = "findviewbyme_cur_temp";
+    public static final String PROPERTY_ALL_TEMP = "findviewbyme_all_temp";
+    public static final String PROPERTY_VAR_PREFIX_ENABLED = "findviewbyme_var_prefix_enabled";
+    public static final String PROPERTY_VAR_PREFIX = "findviewbyme_var_prefix";
 
     public static final String _NAME = "@N";
     public static final String _TYPE = "@T";
