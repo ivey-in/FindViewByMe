@@ -1,9 +1,14 @@
 package com.jaeger.findviewbyme.action;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import java.awt.event.*;
 
-public class EditTemplateDialog extends JDialog {
+public class EditTemplateDialog extends DialogWrapper {
     private JPanel contentPane;
 
     private JLabel tips;
@@ -13,9 +18,9 @@ public class EditTemplateDialog extends JDialog {
 
     private OnSaveListener onSaveListener;
 
-    public EditTemplateDialog() {
-        setContentPane(contentPane);
-        setModal(true);
+    public EditTemplateDialog(Project project) {
+        super(project);
+        init();
 
         save.addActionListener(new ActionListener() {
             @Override
@@ -28,13 +33,6 @@ public class EditTemplateDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 EditTemplateDialog.this.onCancel();
-            }
-        });
-
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
             }
         });
     }
@@ -55,6 +53,16 @@ public class EditTemplateDialog extends JDialog {
 
     private void onCancel() {
         dispose();
+    }
+
+    @Override
+    protected @NotNull Action[] createActions() {
+        return new Action[]{};
+    }
+
+    @Override
+    protected @Nullable JComponent createCenterPanel() {
+        return contentPane;
     }
 
     public interface OnSaveListener {

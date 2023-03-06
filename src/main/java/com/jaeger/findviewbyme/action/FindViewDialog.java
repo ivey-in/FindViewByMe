@@ -2,12 +2,15 @@ package com.jaeger.findviewbyme.action;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.jaeger.findviewbyme.model.FindViewPropes;
 import com.jaeger.findviewbyme.model.ViewPart;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +25,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.util.List;
 
-public class FindViewDialog extends JDialog {
+public class FindViewDialog extends DialogWrapper {
     private JPanel contentPane;
 
     private JLabel tips;
@@ -50,10 +53,9 @@ public class FindViewDialog extends JDialog {
 
     private final static String[] HEADERS = {"selected", "type", "id", "name"};
 
-    public FindViewDialog() {
-        setContentPane(contentPane);
-        setModal(true);
-
+    public FindViewDialog(@Nullable Project project) {
+        super(project);
+        init();
         tips.setText(FindViewPropes.TIPS);
         updateCodeTemp();
         editTemplate.addActionListener(e -> onEditTemplateClick());
@@ -144,24 +146,6 @@ public class FindViewDialog extends JDialog {
                 FindViewDialog.this.onCancel();
             }
         });
-
-        contentPane.registerKeyboardAction(e -> FindViewDialog.this.onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        contentPane.registerKeyboardAction(e -> {
-                    FindViewDialog.this.onCopy();
-                    FindViewDialog.this.onCancel();
-                },
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
     }
 
     public void updateCodeTemp() {
@@ -193,7 +177,7 @@ public class FindViewDialog extends JDialog {
     }
 
     private void onEditTemplateClick() {
-        EditTemplateDialog dialog = new EditTemplateDialog();
+        EditTemplateDialog dialog = new EditTemplateDialog(controller.getProject());
         dialog.setTemplate(controller.propes.getAllTemp());
         dialog.setOnSaveListener(new EditTemplateDialog.OnSaveListener() {
             @Override
@@ -205,10 +189,7 @@ public class FindViewDialog extends JDialog {
                 }
             }
         });
-        dialog.pack();
-        dialog.setLocationRelativeTo(WindowManager.getInstance().getFrame(controller.getProject()));
-        dialog.setAlwaysOnTop(true);
-        dialog.setVisible(true);
+        dialog.show();
     }
 
     public String getSearch() {
@@ -298,5 +279,15 @@ public class FindViewDialog extends JDialog {
         btnInjectCode.setVisible(controller.isInjectCodeSupported());
         updateTable();
         updateTextCode();
+    }
+
+    @Override
+    protected @NotNull Action[] createActions() {
+        return new Action[]{};
+    }
+
+    @Override
+    protected @Nullable JComponent createCenterPanel() {
+        return contentPane;
     }
 }
