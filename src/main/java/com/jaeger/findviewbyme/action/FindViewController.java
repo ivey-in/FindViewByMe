@@ -121,13 +121,13 @@ public class FindViewController {
 
     public void selectNone() {
         for (ViewPart viewPart : viewParts) {
-            viewPart.setSelected(true);
+            viewPart.setSelected(false);
         }
     }
 
     public void selectAll() {
         for (ViewPart viewPart : viewParts) {
-            viewPart.setSelected(false);
+            viewPart.setSelected(true);
         }
     }
 
@@ -162,10 +162,12 @@ public class FindViewController {
             }
             String line = template.get(i);
             for (ViewPart viewPart : viewParts) {
-                sb.append(line.replaceAll(FindViewPropes._TYPE, viewPart.getType())
-                                .replaceAll(FindViewPropes._NAME, viewPart.getName())
-                                .replaceAll(FindViewPropes._ID, "R.id." + viewPart.getId()))
-                        .append("\n");
+                if (viewPart.isSelected()) {
+                    sb.append(line.replaceAll(FindViewPropes._TYPE, viewPart.getType())
+                                    .replaceAll(FindViewPropes._NAME, viewPart.getName())
+                                    .replaceAll(FindViewPropes._ID, "R.id." + viewPart.getId()))
+                            .append("\n");
+                }
             }
         }
         return sb.toString();
