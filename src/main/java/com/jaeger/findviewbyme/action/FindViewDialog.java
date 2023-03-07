@@ -53,8 +53,8 @@ public class FindViewDialog extends DialogWrapper {
 
     private final static String[] HEADERS = {"selected", "type", "id", "name"};
 
-    public FindViewDialog(@Nullable Project project) {
-        super(project);
+    public FindViewDialog() {
+        super(null);
         init();
         tips.setText(FindViewPropes.TIPS);
         updateCodeTemp();
@@ -177,7 +177,7 @@ public class FindViewDialog extends DialogWrapper {
     }
 
     private void onEditTemplateClick() {
-        EditTemplateDialog dialog = new EditTemplateDialog(controller.getProject());
+        EditTemplateDialog dialog = new EditTemplateDialog();
         dialog.setTemplate(controller.propes.getAllTemp());
         dialog.setOnSaveListener(new EditTemplateDialog.OnSaveListener() {
             @Override

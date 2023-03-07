@@ -18,8 +18,8 @@ public class EditTemplateDialog extends DialogWrapper {
 
     private OnSaveListener onSaveListener;
 
-    public EditTemplateDialog(Project project) {
-        super(project);
+    public EditTemplateDialog() {
+        super(null);
         init();
 
         save.addActionListener(new ActionListener() {

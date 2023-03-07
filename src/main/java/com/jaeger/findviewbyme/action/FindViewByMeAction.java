@@ -46,7 +46,7 @@ public class FindViewByMeAction extends AnAction {
             viewParts = getViewParts(project, psiFile, editor);
         }
 
-        FindViewDialog findViewDialog = new FindViewDialog(project);
+        FindViewDialog findViewDialog = new FindViewDialog();
         findViewDialog.setViewParts(project, editor, psiFile, getTargetClass(editor, psiFile), viewParts);
         findViewDialog.show();
     }
